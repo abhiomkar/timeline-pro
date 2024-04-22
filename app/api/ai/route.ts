@@ -1,43 +1,77 @@
 import { VertexAI } from "@google-cloud/vertexai";
-import { GoogleGenerativeAIStream, Message, StreamingTextResponse } from "ai";
-
-const project = process.env.GOOGLE_CLOUD_PROJECT || "";
-const location = "us-central1";
-
-const vertexAI = new VertexAI({ project: project, location: location });
-
-// Google GenAI API can use the edge runtime. This will not work with Vertex AI
-// export const runtime = 'edge';
-
-// Instantiate Gemini models
-const generativeModel = vertexAI.getGenerativeModel({
-  model: "gemini-pro",
-});
-
-const buildGoogleGenAIPrompt = (messages: Message[]) => ({
-  contents: messages
-    .filter(
-      (message) => message.role === "user" || message.role === "assistant"
-    )
-    .map((message) => ({
-      role: message.role === "user" ? "user" : "model",
-      parts: [{ text: message.content }],
-    })),
-});
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   // Extract the `prompt` from the body of the request
-  const { messages } = await req.json();
+  const { personName } = await req.json();
 
-  const geminiStream = await generativeModel.generateContentStream(
-    buildGoogleGenAIPrompt(messages)
-  );
+  const response = await getTimeline(personName);
+  return NextResponse.json(response);
+}
 
-  // Convert the response into a friendly text-stream
-  // GoogleGenerativeAIStream class decodes/extracts the text tokens in the
-  // response and then re-encodes them properly for simple consumption.
-  const stream = GoogleGenerativeAIStream(geminiStream);
+// Initialize Vertex with your Cloud project and location
+const vertex_ai = new VertexAI({
+  project: "timeline-pro-421115",
+  location: "us-central1",
+});
+const model = "gemini-1.5-pro-preview-0409";
 
-  // Respond with the stream
-  return new StreamingTextResponse(stream);
+// Instantiate the models
+const generativeModel = vertex_ai.preview.getGenerativeModel({
+  model: model,
+  generationConfig: {
+    maxOutputTokens: 8192,
+    temperature: 1,
+    topP: 0.95,
+  },
+  safetySettings: [
+    {
+      category: "HARM_CATEGORY_HATE_SPEECH",
+      threshold: "BLOCK_MEDIUM_AND_ABOVE",
+    },
+    {
+      category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+      threshold: "BLOCK_MEDIUM_AND_ABOVE",
+    },
+    {
+      category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+      threshold: "BLOCK_MEDIUM_AND_ABOVE",
+    },
+    {
+      category: "HARM_CATEGORY_HARASSMENT",
+      threshold: "BLOCK_MEDIUM_AND_ABOVE",
+    },
+  ],
+});
+
+// - create json object with birthDate and deathDate keys for given person name
+// - if a person is still alive then set deathDate as null.
+// - Always use YYYY-MM-DD format for dates.
+// - avoid using markdown format.
+// - the output should be a json object.
+
+async function getTimeline(personName: string) {
+  const req = {
+    contents: [
+      {
+        role: "user",
+        parts: [
+          {
+            text: `
+- create json output with birthDate and deathDate as keys for given person name
+- if a person is still alive then set deathDate as null.
+- Always use YYYY-MM-DD format for dates.
+- avoid using markdown format.
+- Example output for person name "Steve Jobs": {birthDate: "1955-02-24", "deathDate": "2011-10-05"}
+
+      Person name:
+      ${personName}`,
+          },
+        ],
+      },
+    ],
+  };
+
+  const result = await generativeModel.generateContent(req);
+  return result.response;
 }

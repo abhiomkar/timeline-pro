@@ -1,16 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface Person {
+  name: string;
+  timeline?: string;
+}
 
 export default function Home() {
-  const [list, setList] = useState<String[]>([]);
+  const [personList, setPersonList] = useState<Person[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
+  const [timeline, setTimeline] = useState<string>("");
+  const [currentPerson, setCurrentPerson] = useState<Person | null>(null);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setList([...list, inputValue]);
+    const newPerson = { name: inputValue, timeline };
+    setPersonList([...personList, newPerson]);
     setInputValue("");
+
+    const response = await fetch("/api/ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        personName: inputValue,
+      }),
+    }).then((response) => response.json());
+
+    const personTimeline = JSON.stringify(
+      response.candidates[0].content.parts[0].text
+    );
+    setCurrentPerson({ name: inputValue, timeline: personTimeline });
   };
+
+  useEffect(() => {
+    setPersonList(
+      personList.map((person) => {
+        if (person.name === currentPerson?.name) {
+          return { ...person, timeline: currentPerson?.timeline };
+        }
+
+        return person;
+      })
+    );
+  }, [currentPerson]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -24,8 +59,10 @@ export default function Home() {
           <button type="submit">Submit</button>
         </form>
         <ul>
-          {list.map((item, index) => (
-            <li key={index}>{item}</li>
+          {personList.map((person, index) => (
+            <li key={index}>
+              <strong>{person.name}</strong> {person.timeline}
+            </li>
           ))}
         </ul>
       </div>
