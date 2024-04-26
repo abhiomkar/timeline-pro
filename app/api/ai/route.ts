@@ -107,7 +107,7 @@ export async function POST(req: Request) {
 
   if (
     // Validate date format YYYY-MM-DD by regex
-    !text?.match(/^(\d{4}-\d{2}-\d{2}),(0|\d{4}-\d{2}-\d{2})$/) ||
+    !text?.match(/^(\d{1,4}-\d{2}-\d{2}),(0|\d{1,4}-\d{2}-\d{2})$/) ||
     // Validate date value by regex, e.g., handles invalid 0000-00-00 date value.
     text?.split(",").filter((date) => !Number.isNaN(new Date(date).getDate()))
       .length !== 2

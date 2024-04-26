@@ -12,11 +12,12 @@ interface Person {
 
 export default function Home() {
   const samplePersonList = [
-    { name: "Steve Jobs", timeline: "1955-02-24,2011-10-05" },
     { name: "Elon Musk", timeline: "1971-06-28,0" },
-    { name: "Bill Gates", timeline: "1955-10-28,0" },
+    { name: "Steve Jobs", timeline: "1955-02-24,2011-10-05" },
+    { name: "Stephen Hawking", timeline: "1942-01-08,2018-03-14" },
+    { name: "Nelson Mandela", timeline: "1918-07-18,2013-12-05" },
     { name: "Mother Teresa", timeline: "1910-08-26,1997-09-05" },
-    { name: "Lord Buddha", timeline: "0563-04-08,0483-02-15" },
+    { name: "Rani Lakshmibai", timeline: "1828-11-19,1858-06-18" },
   ];
   const [personList, setPersonList] = useState<Person[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
@@ -72,7 +73,7 @@ export default function Home() {
   }, [currentPerson]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-2">
+    <main className="flex min-h-screen flex-col items-center justify-between p-2 gap-4">
       <div className="z-10 w-full max-w-2xl text-sm flex flex-col">
         <h1 className="text-2xl font-bold pt-2 pb-3">Timeline Pro</h1>
         <form onSubmit={handleSubmit} className="flex gap-1">
@@ -113,6 +114,18 @@ export default function Home() {
             </li>
           ))}
         </ul>
+      </div>
+      <div className="flex z-10 w-full max-w-2xl text-xs pb-4 flex-col justify-start items-start text-gray-600 gap-1">
+        <div>The data might be inaccurate since it is based on an LLM.</div>
+        <div>
+          Powered by Vertex AI + Vercel. See{" "}
+          <a
+            className="text-primary underline-offset-4 hover:underline"
+            href="https://github.com/abhiomkar/timeline-pro"
+          >
+            Source Code
+          </a>
+        </div>
       </div>
     </main>
   );
