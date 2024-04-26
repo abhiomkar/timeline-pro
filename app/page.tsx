@@ -27,12 +27,9 @@ export default function Home() {
       body: JSON.stringify({
         personName: inputValue,
       }),
-    }).then((response) => response.json());
+    }).then((res) => res.json());
 
-    const personTimeline = JSON.stringify(
-      response.candidates[0].content.parts[0].text
-    );
-    setCurrentPerson({ name: inputValue, timeline: personTimeline });
+    setCurrentPerson({ name: inputValue, timeline: response.text });
   };
 
   useEffect(() => {
