@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Timeline Pro",
-  description: "Timeline Pro - display timeline of persons",
+  title: "People Timeline",
+  description: "People Timeline - display timeline of people",
 };
 
 export default function RootLayout({

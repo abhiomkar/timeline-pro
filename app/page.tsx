@@ -75,7 +75,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-2 gap-4">
       <div className="z-10 w-full max-w-2xl text-sm flex flex-col">
-        <h1 className="text-2xl font-bold pt-2 pb-3">Timeline Pro</h1>
+        <h1 className="text-2xl font-bold pt-2 pb-3">People Timeline</h1>
         <form onSubmit={handleSubmit} className="flex gap-1">
           <Input
             placeholder="Person name"
