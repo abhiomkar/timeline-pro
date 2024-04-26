@@ -16,7 +16,7 @@ export default function Home() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const newPerson = { name: inputValue, timeline };
-    setPersonList([...personList, newPerson]);
+    setPersonList([newPerson, ...personList]);
     setInputValue("");
 
     const response = await fetch("/api/ai", {
@@ -34,13 +34,21 @@ export default function Home() {
 
   useEffect(() => {
     setPersonList(
-      personList.map((person) => {
-        if (person.name === currentPerson?.name) {
-          return { ...person, timeline: currentPerson?.timeline };
-        }
+      personList
+        .map((person) => {
+          if (person.name === currentPerson?.name) {
+            return { ...person, timeline: currentPerson?.timeline };
+          }
 
-        return person;
-      })
+          return person;
+        })
+        .sort((a: Person, b: Person) => {
+          if (a.timeline && b.timeline) {
+            return parseInt(b.timeline, 10) - parseInt(a.timeline, 10);
+          }
+
+          return 0;
+        })
     );
   }, [currentPerson]);
 
