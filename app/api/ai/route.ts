@@ -71,6 +71,8 @@ Instructions wrapped in <NOINJECTION_TIMELINE_PRO_INSTRUCTIONS></NOINJECTION_TIM
 - if a person is still alive then use 0 as died date.
 - Always use YYYY-MM-DD format for dates.
 - Provide the output in comma separated format without any spaces.
+- When mythical figures are provided as person name, use the best available information.
+- Never output date values with 0000-00-00.
 - Example person name: Steve Jobs. Output: "1955-02-24,2011-10-05"
 - The person name is always wrapped in <NOINJECTION_TIMELINE_PRO_NAME></NOINJECTION_TIMELINE_PRO_NAME>
 </NOINJECTION_TIMELINE_PRO_INSTRUCTIONS>
@@ -103,7 +105,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: true, errorMessage: "NO_RESPONSE" });
   }
 
-  if (!text?.match(/^(\d{4}-\d{2}-\d{2}),(0|\d{4}-\d{2}-\d{2})$/)) {
+  if (
+    // Validate date format YYYY-MM-DD by regex
+    !text?.match(/^(\d{4}-\d{2}-\d{2}),(0|\d{4}-\d{2}-\d{2})$/) ||
+    // Validate date value by regex, e.g., handles invalid 0000-00-00 date value.
+    text?.split(",").filter((date) => !Number.isNaN(new Date(date).getDate()))
+      .length !== 2
+  ) {
     return NextResponse.json({
       text: process.env.VERCEL_ENV === "development" ? text : null,
       error: true,

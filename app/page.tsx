@@ -11,7 +11,7 @@ interface Person {
 }
 
 export default function Home() {
-  const debugPersonList = [
+  const samplePersonList = [
     { name: "Steve Jobs", timeline: "1955-02-24,2011-10-05" },
     { name: "Elon Musk", timeline: "1971-06-28,0" },
     { name: "Bill Gates", timeline: "1955-10-28,0" },
@@ -37,12 +37,18 @@ export default function Home() {
       }),
     }).then((res) => res.json());
 
-    setCurrentPerson({ name: inputValue, timeline: response.text });
+    if (!response.error) {
+      setCurrentPerson({ name: inputValue, timeline: response.text });
+    }
   };
 
   const handleTryExample = () => {
-    setPersonList(debugPersonList);
+    setPersonList(samplePersonList);
     setCurrentPerson(null);
+  };
+
+  const handleReset = () => {
+    setPersonList([]);
   };
 
   useEffect(() => {
@@ -78,13 +84,14 @@ export default function Home() {
           />
           <Button type="submit">Submit</Button>
         </form>
-        <Button
-          variant="link"
-          onClick={handleTryExample}
-          className="justify-start pl-3"
-        >
-          Try example
-        </Button>
+        <div className="flex justify-start">
+          <Button variant="link" onClick={handleTryExample}>
+            Try example
+          </Button>
+          <Button variant="link" onClick={handleReset}>
+            Reset
+          </Button>
+        </div>
         <ul className="pt-8 pb-4 px-2">
           {personList.map((person, index) => (
             <li key={index} className="flex flex-col">
