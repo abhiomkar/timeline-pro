@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "env": "vercel env pull"
   },
   "dependencies": {
     "@google-cloud/vertexai": "^1.1.0",

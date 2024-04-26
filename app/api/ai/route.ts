@@ -13,10 +13,21 @@ export async function POST(req: Request) {
   return NextResponse.json(response);
 }
 
+const credential = JSON.parse(
+  Buffer.from(process.env.GOOGLE_SERVICE_KEY ?? "", "base64").toString()
+);
+
 // Initialize Vertex with your Cloud project and location
 const vertex_ai = new VertexAI({
   project: "timeline-pro-421115",
   location: "us-central1",
+  googleAuthOptions: {
+    credentials: {
+      client_email: credential.client_email,
+      client_id: credential.client_id,
+      private_key: credential.private_key,
+    },
+  },
 });
 const model = "gemini-1.5-pro-preview-0409";
 
